@@ -4,5 +4,6 @@ export const kafkaConfig = {
     consumerGroupId: process.env.KAFKA_CONSUMER_GROUPID as string,
     topics: {
         user_registration_event: 'register-user',
+        user_confirmation_event: 'confirm-user',
     },
 };

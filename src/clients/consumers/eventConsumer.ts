@@ -26,6 +26,9 @@ export const consumerEventDispatcher = async () => {
                     case kafkaConfig.topics.user_registration_event:
                         await consumeUserRegistrationEvent(topic, message);
                         break;
+                    case kafkaConfig.topics.user_confirmation_event:
+                        await consumeUserConfirmationEvent(topic, message);
+                        break;
                 }
             },
         });
@@ -39,6 +42,16 @@ export const consumeUserRegistrationEvent = async (topic: string, message: Kafka
         const {user, verificationToken}: {user: UserDTO, verificationToken: VerificationTokenDTO} = JSON.parse(message.value!.toString());
         logger.info(`Received message from topic ${topic}: ${user.username}`);
         await notificationService.sendUserTokenConfirmationNotification(user, verificationToken);
+    } catch (error) {
+        logger.error(`Error consuming topic '${topic}' with the following message '${message.value}': ${error}`);
+    }
+}
+
+export const consumeUserConfirmationEvent = async (topic: string, message: KafkaMessage) => {
+    try {
+        const {user}: {user: UserDTO} = JSON.parse(message.value!.toString());
+        logger.info(`Received message from topic ${topic}: ${user.username}`);
+        await notificationService.sendUserSuccessfulConfirmationNotification(user);
     } catch (error) {
         logger.error(`Error consuming topic '${topic}' with the following message '${message.value}': ${error}`);
     }
