@@ -2,8 +2,9 @@ import {consumer} from "../kafkaClient";
 import logger from "../../config/logging/logger";
 import {kafkaConfig} from "../../config/kafkaConfig";
 import {KafkaMessage} from "kafkajs";
-import {plainToInstance} from "class-transformer";
+import * as notificationService from "./../../services/notificationService"
 import {UserDTO} from "../../dtos/UserDTO";
+import {VerificationTokenDTO} from "../../dtos/VerificationTokenDTO";
 
 export const subscribeToTopics = async () => {
     try {
@@ -35,9 +36,9 @@ export const consumerEventDispatcher = async () => {
 
 export const consumeUserRegistrationEvent = async (topic: string, message: KafkaMessage) => {
     try {
-        const user: UserDTO = JSON.parse(message.value!.toString());
-        logger.info(`Received message from topic ${topic}: ${message.value}`);
-        logger.info("Sending email to: " + user.email)
+        const {user, verificationToken}: {user: UserDTO, verificationToken: VerificationTokenDTO} = JSON.parse(message.value!.toString());
+        logger.info(`Received message from topic ${topic}: ${user.username}`);
+        await notificationService.sendUserTokenConfirmationNotification(user, verificationToken);
     } catch (error) {
         logger.error(`Error consuming topic '${topic}' with the following message '${message.value}': ${error}`);
     }
