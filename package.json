@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc"
+    "test": "NODE_ENV=test; jest --config jest.config.js --coverage",
+    "build": "tsc",
+    "start-dev": "NODE_ENV=local; tsc && node dist/server.js",
+    "build-image": "docker build --tag $(jq -r '.name' package.json):$(jq -r '.version' package.json) ."
   },
   "author": "",
   "license": "ISC",

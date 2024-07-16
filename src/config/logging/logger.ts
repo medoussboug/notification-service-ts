@@ -1,9 +1,10 @@
 import winston from 'winston';
-
+import {CorrelationContext} from "../CorrealtionContext";
 const { combine, timestamp, printf, colorize, errors } = winston.format;
 
 const logFormat = printf(({ timestamp, level, message, stack }) => {
-    return `${timestamp} [${level}]: ${stack || message}`;
+    const correlationId = CorrelationContext.getCorrelationID();
+    return `${timestamp} [${level}] (Correlation ID: ${correlationId}): ${stack || message}`;
 });
 
 const logger = winston.createLogger({
